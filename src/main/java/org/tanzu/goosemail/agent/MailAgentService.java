@@ -21,15 +21,15 @@ public class MailAgentService {
     }
 
     @Async
-    public void processEmail(String sender, String subject, String body) {
-        log.info("Processing email from {} with subject: {}", sender, subject);
+    public void processEmail(String sender, String recipient, String subject, String body) {
+        log.info("Processing email from {} to {} with subject: {}", sender, recipient, subject);
 
         try {
-            String response = gooseService.executePrompt(body);
+            String response = gooseService.executePrompt(sender, subject, body);
 
             String replySubject = subject.startsWith("Re:") ? subject : "Re: " + subject;
 
-            emailService.sendEmail(sender, replySubject, response);
+            emailService.sendEmail(sender, replySubject, response, recipient);
 
             log.info("Successfully processed and replied to email from {}", sender);
 
@@ -40,7 +40,8 @@ public class MailAgentService {
                 emailService.sendEmail(
                         sender,
                         "Re: " + subject + " [Error]",
-                        "Sorry, there was an error processing your request:\n\n" + e.getMessage()
+                        "Sorry, there was an error processing your request:\n\n" + e.getMessage(),
+                        recipient
                 );
             } catch (Exception emailError) {
                 log.error("Failed to send error response to {}: {}", sender, emailError.getMessage());

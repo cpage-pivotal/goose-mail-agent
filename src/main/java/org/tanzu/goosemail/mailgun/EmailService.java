@@ -41,13 +41,14 @@ public class EmailService {
                 .build();
     }
 
-    public void sendEmail(String to, String subject, String markdownBody) {
-        log.info("Sending email to: {} with subject: {}", to, subject);
+    public void sendEmail(String to, String subject, String markdownBody, String replyTo) {
+        log.info("Sending email to: {} with subject: {} (reply-to: {})", to, subject, replyTo);
 
         String htmlBody = markdownService.convertToHtml(markdownBody);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("from", fromAddress);
+        formData.add("h:Reply-To", replyTo);
         formData.add("to", to);
         formData.add("subject", subject);
         formData.add("text", markdownBody);

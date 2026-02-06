@@ -36,21 +36,28 @@ public class MailgunWebhookController {
     @PostMapping("/mailgun")
     public ResponseEntity<String> handleIncomingEmail(
             @RequestParam("sender") String sender,
+            @RequestParam("recipient") String recipient,
             @RequestParam("subject") String subject,
             @RequestParam("body-plain") String bodyPlain,
+            @RequestParam(value = "stripped-text", required = false) String strippedText,
             @RequestParam("timestamp") String timestamp,
             @RequestParam("token") String token,
             @RequestParam("signature") String signature) {
 
-        log.info("Received email from: {} with subject: {}", sender, subject);
+        log.info("Received email from: {} to: {} with subject: {}", sender, recipient, subject);
 
         if (!verifySignature(timestamp, token, signature)) {
             log.warn("Invalid webhook signature from sender: {}", sender);
             return ResponseEntity.status(403).body("Invalid signature");
         }
 
+        // Prefer stripped-text (quoted replies and signatures removed) since Goose
+        // already has the conversation context in its session. Fall back to body-plain
+        // if stripped-text is absent or empty.
+        String body = (strippedText != null && !strippedText.isBlank()) ? strippedText : bodyPlain;
+
         try {
-            mailAgentService.processEmail(sender, subject, bodyPlain);
+            mailAgentService.processEmail(sender, recipient, subject, body);
             return ResponseEntity.ok("Email processed");
         } catch (Exception e) {
             log.error("Error processing email from {}: {}", sender, e.getMessage(), e);
