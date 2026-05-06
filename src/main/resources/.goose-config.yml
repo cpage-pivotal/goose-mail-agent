@@ -14,4 +14,9 @@ session:
   # Maximum turns before requiring user input (prevents runaway sessions)
   max_turns: 100
 
+mcpServers:
+  - name: github
+    type: streamable_http
+    url: "https://api.githubcopilot.com/mcp/"
+    brokerAuth: true
 

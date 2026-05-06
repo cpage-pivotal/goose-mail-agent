@@ -8,7 +8,7 @@ applications:
       - https://github.com/cpage-pivotal/goose-buildpack
       - java_buildpack_offline
     env:
-      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 25.+ } }'
       MAILGUN_API_KEY: ((MAILGUN_API_KEY))
       MAILGUN_SIGNING_KEY: ((MAILGUN_SIGNING_KEY))
       OPENAI_API_KEY: ((OPENAI_API_KEY))
